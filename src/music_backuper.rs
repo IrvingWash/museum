@@ -101,7 +101,7 @@ impl MusicBackuper {
             .is_file()
         {
             println!(
-                "Skipped a file while parsing artists: {}",
+                "Skipped a file while parsing: {}",
                 dir_entry.path().to_string_lossy()
             );
 
