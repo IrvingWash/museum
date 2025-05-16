@@ -10,13 +10,20 @@ pub struct MusicBackupEntry {
     pub albums: Vec<String>,
 }
 
-pub fn backup_music(music_dir_path: PathBuf) -> Result<Vec<MusicBackupEntry>, String> {
+pub fn backup_music(
+    music_dir_path: PathBuf,
+    ignore: Vec<String>,
+) -> Result<Vec<MusicBackupEntry>, String> {
     let music_dir = fs::read_dir(music_dir_path).map_err(utils::error_to_string)?;
 
     let mut result = Vec::with_capacity(300);
 
     for artist_dir in music_dir {
         let artist_dir = artist_dir.map_err(utils::error_to_string)?;
+
+        if ignore.contains(&artist_dir.file_name().to_string_lossy().to_string()) {
+            continue;
+        }
 
         if artist_dir
             .file_type()
@@ -40,6 +47,10 @@ pub fn backup_music(music_dir_path: PathBuf) -> Result<Vec<MusicBackupEntry>, St
 
         for album_dir in artist_dir {
             let album_dir = album_dir.map_err(utils::error_to_string)?;
+
+            if ignore.contains(&album_dir.file_name().to_string_lossy().to_string()) {
+                continue;
+            }
 
             if album_dir
                 .file_type()

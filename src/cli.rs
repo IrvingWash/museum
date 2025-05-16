@@ -26,6 +26,9 @@ pub enum Command {
         /// Path to pub the json file with the backup
         #[arg(short, long)]
         save_path: String,
+        /// Entries to ignore
+        #[arg(short, long, value_delimiter = ',')]
+        ignore: Vec<String>,
     },
 }
 
@@ -34,8 +37,12 @@ impl Cli {
         Cli::parse()
     }
 
-    pub fn backup(music_path: String, save_path: String) -> Result<(), String> {
-        let backup = music_backuper::backup_music(PathBuf::from(music_path))?;
+    pub fn backup(
+        music_path: String,
+        save_path: String,
+        ignore: Vec<String>,
+    ) -> Result<(), String> {
+        let backup = music_backuper::backup_music(PathBuf::from(music_path), ignore)?;
 
         let save_path = PathBuf::from(save_path);
 

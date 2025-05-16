@@ -10,7 +10,8 @@ fn main() -> Result<(), String> {
         Command::Backup {
             music_path,
             save_path,
-        } => Cli::backup(music_path, save_path)?,
+            ignore,
+        } => Cli::backup(music_path, save_path, ignore)?,
     };
 
     Ok(())
