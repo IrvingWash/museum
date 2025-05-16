@@ -4,8 +4,7 @@ use std::{
     path::PathBuf,
 };
 
-use serde::Serialize;
-
+use crate::music_backup_entry::MusicBackupEntry;
 use crate::utils;
 
 pub struct MusicBackuper {
@@ -13,12 +12,6 @@ pub struct MusicBackuper {
     path: PathBuf,
     save_path: PathBuf,
     ignore: Vec<String>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct MusicBackupEntry {
-    pub artist: String,
-    pub albums: Vec<String>,
 }
 
 impl MusicBackuper {
@@ -44,6 +37,8 @@ impl MusicBackuper {
             let mut entry = MusicBackupEntry {
                 artist: artist_dir.file_name().to_string_lossy().to_string(),
                 albums: Vec::new(),
+                downloaded: true,
+                id: self.backup.len() + 1,
             };
 
             let artist_dir = fs::read_dir(artist_dir.path()).map_err(utils::error_to_string)?;
