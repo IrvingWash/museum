@@ -3,15 +3,29 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 use museum::music_backuper::MusicBackuper;
 
+pub fn run() -> Result<(), String> {
+    let cli = Cli::parse();
+
+    match cli.command {
+        Command::Backup {
+            music_path,
+            save_path,
+            ignore,
+        } => Cli::backup(music_path, save_path, ignore)?,
+    }
+
+    Ok(())
+}
+
 #[derive(Parser)]
 #[command(version, about)]
-pub struct Cli {
+struct Cli {
     #[command(subcommand)]
-    pub command: Command,
+    command: Command,
 }
 
 #[derive(Subcommand)]
-pub enum Command {
+enum Command {
     /// Backup a directory of music to json
     Backup {
         /// Path to the music directory
@@ -27,15 +41,7 @@ pub enum Command {
 }
 
 impl Cli {
-    pub fn new() -> Cli {
-        Cli::parse()
-    }
-
-    pub fn backup(
-        music_path: String,
-        save_path: String,
-        ignore: Vec<String>,
-    ) -> Result<(), String> {
+    fn backup(music_path: String, save_path: String, ignore: Vec<String>) -> Result<(), String> {
         let mut backuper =
             MusicBackuper::new(PathBuf::from(music_path), PathBuf::from(save_path), ignore);
 
