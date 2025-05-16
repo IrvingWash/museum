@@ -1,13 +1,7 @@
-use std::{
-    fs::{self, File},
-    io::Write,
-    path::PathBuf,
-};
+use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
-use museum::music_backuper;
-
-use crate::utils;
+use museum::music_backuper::MusicBackuper;
 
 #[derive(Parser)]
 #[command(version, about)]
@@ -42,26 +36,12 @@ impl Cli {
         save_path: String,
         ignore: Vec<String>,
     ) -> Result<(), String> {
-        let backup = music_backuper::backup_music(PathBuf::from(music_path), ignore)?;
+        let mut backuper =
+            MusicBackuper::new(PathBuf::from(music_path), PathBuf::from(save_path), ignore);
 
-        let save_path = PathBuf::from(save_path);
+        backuper.backup()?;
 
-        fs::create_dir_all(
-            save_path
-                .parent()
-                .ok_or("Failed to create save file path")?,
-        )
-        .map_err(utils::error_to_string)?;
-
-        let mut backup_file = File::create(save_path).map_err(utils::error_to_string)?;
-
-        backup_file
-            .write(
-                serde_json::to_string_pretty(&backup)
-                    .map_err(utils::error_to_string)?
-                    .as_bytes(),
-            )
-            .map_err(utils::error_to_string)?;
+        backuper.save()?;
 
         Ok(())
     }

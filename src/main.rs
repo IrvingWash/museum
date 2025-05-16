@@ -1,7 +1,6 @@
 use cli::{Cli, Command};
 
 mod cli;
-mod utils;
 
 fn main() -> Result<(), String> {
     let cli = Cli::new();
