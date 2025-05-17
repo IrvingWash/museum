@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use eframe::{
     NativeOptions,
-    egui::{self, Ui},
+    egui::{self, ScrollArea, Ui},
 };
 use museum::{backup_manager::BackupManager, music_backuper::MusicBackuper};
 
@@ -117,6 +117,7 @@ struct ManageModel {
     manager: Option<BackupManager>,
     is_done: bool,
     error: Option<String>,
+    skip: String,
 }
 
 impl ManageModel {
@@ -135,20 +136,36 @@ impl ManageModel {
                 }
             }
             Some(manager) => {
-                for entry in manager.get_backup().clone() {
-                    ui.label(format!("{}", entry));
+                let label = ui.label("Skip to:");
+                ui.text_edit_singleline(&mut self.skip)
+                    .labelled_by(label.id);
 
-                    if ui.button("Toggle").clicked() {
-                        manager.toggle_downloaded(entry.id);
+                let mut backup = manager.get_backup().clone();
+                let position = backup
+                    .iter()
+                    .position(|entry| entry.artist.starts_with(&self.skip));
 
-                        match manager.save() {
-                            Ok(_) => {
-                                self.error = None;
+                match position {
+                    Some(position) => backup = backup.split_off(position),
+                    None => {}
+                }
+
+                ScrollArea::vertical().show(ui, |ui| {
+                    for entry in backup {
+                        ui.label(format!("{}", entry));
+
+                        if ui.button("Toggle").clicked() {
+                            manager.toggle_downloaded(entry.id);
+
+                            match manager.save() {
+                                Ok(_) => {
+                                    self.error = None;
+                                }
+                                Err(e) => self.error = Some(e),
                             }
-                            Err(e) => self.error = Some(e),
                         }
                     }
-                }
+                });
             }
         }
     }
