@@ -39,9 +39,8 @@ impl BackupManager {
     pub fn toggle_downloaded(&mut self, id: usize) {
         let entry = self.backup.iter_mut().find(|entry| entry.id == id);
 
-        match entry {
-            Some(entry) => entry.downloaded = !entry.downloaded,
-            None => {}
+        if let Some(entry) = entry {
+            entry.downloaded = !entry.downloaded
         }
     }
 
