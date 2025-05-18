@@ -141,6 +141,7 @@ impl ManageModel {
                     .labelled_by(label.id);
 
                 let mut backup = manager.get_backup().clone();
+                backup.sort_by(|a, b| a.artist.cmp(&b.artist));
                 let position = backup
                     .iter()
                     .position(|entry| entry.artist.starts_with(&self.skip));
